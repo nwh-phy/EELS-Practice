@@ -1,0 +1,4 @@
+-r requirements.txt
+# Optional training-only dependency. Install on the designated ML workstation,
+# not on the small-storage development Mac.
+torch>=2.6,<3
