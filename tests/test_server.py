@@ -228,6 +228,7 @@ class HTTPTests(unittest.TestCase):
             self.assertEqual(meta['max_order'], 5)
             self.assertEqual(meta['default_practice_order'], 3)
             self.assertEqual(meta['generator_version'], GENERATOR_VERSION)
+            self.assertEqual(meta['stats_version'], 2)
             self.assertEqual(meta['control_limit'], 300)
             self.assertEqual(meta['difficulties'], {'easy': 20, 'medium': 45, 'hard': 90, 'hell': 300})
             self.assertEqual(meta['custom_amplitude_min'], 0.1)
@@ -294,7 +295,11 @@ class HTTPTests(unittest.TestCase):
             with client.getresponse() as response:
                 self.assertEqual(response.status, 200)
                 response.read()
-            self.assertEqual(options, [(1, 30)])
+            self.assertEqual(len(options), 1)
+            # Darwin reports a non-zero TCP_NODELAY value of 4 while Linux
+            # and Windows report 1; all mean that the option is enabled.
+            self.assertNotEqual(options[0][0], 0)
+            self.assertEqual(options[0][1], 30)
         finally:
             client.close()
             server.shutdown(); server.server_close(); thread.join(timeout=5)
